@@ -461,8 +461,6 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
 
         if phase is 'train':
             sys.train(True)
-            # step scheduler
-            scheduler.step()
 
         elif phase is 'valid':
             sys.train(False)
@@ -538,11 +536,16 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
                 # backward & optimise
                 loss.backward()
                 opt.step()
-
+            
+            print("Phase: {} Batch {} Loss : {}".format(phase, i, epoch_loss))
             # del grad trees to save memory
             del loss, inpt, output
 
         # epoch loss averaged over batch number
+        if phase == "train":
+            # step scheduler
+            scheduler.step()
+            
         epoch_loss = run_loss / (i+1)
 
         if args.verbose:
