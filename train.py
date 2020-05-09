@@ -537,7 +537,7 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
                 loss.backward()
                 opt.step()
             
-            print("Phase: {} Batch {} Loss : {}".format(phase, i, epoch_loss))
+            print("Phase: {} Batch {} Loss : {}".format(phase, i, loss.item()))
             # del grad trees to save memory
             del loss, inpt, output
 
