@@ -577,7 +577,7 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
 
     if args.checkpoint:
         # save checkpoint every 50 epochs
-        if(epoch+1%50):
+        if((epoch+1)%50):
             chkp = {
                 'epoch': epoch+1,
                 'sys': sys.state_dict(),
