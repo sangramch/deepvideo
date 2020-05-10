@@ -453,6 +453,8 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
         print("--------------------------------------")
 
     epoch_start = time.time()
+    t_loss=0
+    v_loss=0
 
     for phase in ['train', 'valid']:
 
@@ -537,19 +539,25 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
                 loss.backward()
                 opt.step()
             
-            print("Phase: {} Batch {} Loss : {}".format(phase, i, loss.item()))
+            if args.verbose:
+                print("Phase: {} Batch {} Loss : {}".format(phase, i+1, loss.item()))
             # del grad trees to save memory
             del loss, inpt, output
-
-        # epoch loss averaged over batch number
+            
+            
         if phase == "train":
             # step scheduler
             scheduler.step()
-            
+        
+        # epoch loss averaged over batch number
         epoch_loss = run_loss / (i+1)
-
+        
+        if phase=="train":
+            t_loss=epoch_loss
+        elif phase=="valid":
+            v_loss=epoch_loss
+            
         if args.verbose:
-            print("Phase: {} Loss : {}".format(phase, epoch_loss))
             writer.add_scalar('{}/loss'.format(phase), epoch_loss, epoch)
 
         # save best system
@@ -558,24 +566,27 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
             fn = ''.join([save_loc, '/', sys.name, '.pt'])
             torch.save(sys.state_dict(), fn)
 
-    # end of epoch
+    # end of epoch 
     epoch_time = (time.time() - epoch_start) / 60
 
     if args.verbose:
+        print("Phase: Train Loss : {}".format(phase, t_loss))
+        print("Phase: Validation Loss : {}".format(phase, v_loss))
         print("Epoch time: {} min".format(epoch_time))
         print("-------------------------------------")
 
     if args.checkpoint:
-        # save checkpoint
-        chkp = {
-            'epoch': epoch+1,
-            'sys': sys.state_dict(),
-            'optimizer': opt.state_dict(),
-            'scheduler': scheduler.state_dict(),
-            'best_loss': best_loss,
-            'time': time.time() - train_start + t_prev
-        }
-        torch.save(chkp, state_file)
+        # save checkpoint every 50 epochs
+        if(epoch+1%50):
+            chkp = {
+                'epoch': epoch+1,
+                'sys': sys.state_dict(),
+                'optimizer': opt.state_dict(),
+                'scheduler': scheduler.state_dict(),
+                'best_loss': best_loss,
+                'time': time.time() - train_start + t_prev
+            }
+            torch.save(chkp, state_file)
 
 # end of Training
 train_time = (time.time() - train_start + t_prev) / 60
