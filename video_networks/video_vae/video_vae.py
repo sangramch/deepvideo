@@ -46,6 +46,13 @@ class VideoVAE(nn.Module):
         # decode latent space
         x = self.decoder(z)
         return x
+    
+    def encode_decode(self,x):
+        i_fr_0 = x[:, :, 0, :, :]
+        mu, logvar = self.encoder(x,iframe=i_fr_0)
+        b=self._reparameterize(mu, logvar)
+        x=self.decoder(b)
+        return x,b
 
     def forward(self, x):
 
