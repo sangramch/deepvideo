@@ -570,8 +570,8 @@ for epoch in range(current_epoch, args.epochs + 1, 1):
     epoch_time = (time.time() - epoch_start) / 60
 
     if args.verbose:
-        print("Phase: Train Loss : {}".format(phase, t_loss))
-        print("Phase: Validation Loss : {}".format(phase, v_loss))
+        print("Phase: Train Loss : {}".format(t_loss))
+        print("Phase: Validation Loss : {}".format(v_loss))
         print("Epoch time: {} min".format(epoch_time))
         print("-------------------------------------")
 
